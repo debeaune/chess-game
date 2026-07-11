@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import type { Board, Position } from '../types/chess'
 import { createInitialBoard } from '../utils/initialBoard'
+import { getPawnMoves, getRookMoves, getBishopMoves,  getKnightMoves, getQueenMoves, getKingMoves } from '../utils/move'
 
 interface GameState {
     board: Board
@@ -21,14 +22,51 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     selectedPosition: null,
     possibleMoves: [],
 
-    selectPiece: (position) => set((state) => ({
-        selectedPosition: position,
-        possibleMoves: [] // on calculera les mouvements après
-    })),
+    selectPiece: (position) => set((state) => {
+        const piece = state.board[position.row][position.col] 
+        console.log('currentPlayer', state.currentPlayer)
+        if (!piece) return { selectedPosition: null, possibleMoves: [] }
+        if (piece.color !== state.currentPlayer) return { selectedPosition: null, possibleMoves: [] }
+    
+        let moves: Position[] = []
+    
+        if (piece.type === 'pawn') {
+            moves = getPawnMoves(state.board, position, piece.color)
+        } else if (piece.type === 'rook') {
+            moves = getRookMoves(state.board, position, piece.color)
+        } else if (piece.type === 'bishop') {
+            moves = getBishopMoves(state.board, position, piece.color)
+        }  else if (piece.type === 'knight') {
+            moves = getKnightMoves(state.board, position, piece.color)
+        }  else if (piece.type === 'queen') {
+            moves = getQueenMoves(state.board, position, piece.color)
+        } else if (piece.type === 'king') {
+            moves = getKingMoves(state.board, position, piece.color)
+        }
+    
+        return {
+            selectedPosition: position,
+            possibleMoves: moves
+        }
+    }),
 
-    movePiece: (to) => set((state) => ({
-        // on implémentera ça après
-    })),
+    movePiece: (to) => set((state) => {
+        console.log('movePiece appelé', to)
+        const { board, selectedPosition, currentPlayer } = state
+    
+        if (!selectedPosition) return {}
+    
+        const newBoard = board.map(row => [...row])
+        newBoard[to.row][to.col] = newBoard[selectedPosition.row][selectedPosition.col]
+        newBoard[selectedPosition.row][selectedPosition.col] = null
+    
+        return {
+            board: newBoard,
+            selectedPosition: null,
+            possibleMoves: [],
+            currentPlayer: currentPlayer === 'white' ? 'black' : 'white'
+        }
+    }),
 
     resetGame: () => set({
         board: createInitialBoard(),
