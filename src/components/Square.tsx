@@ -20,14 +20,14 @@ function Square({ piece, isLight, isSelected, isPossibleMove, onClick }: SquareP
     return (
         <div
             onClick={onClick}
-            className={`w-12 h-12 flex items-center justify-center cursor-pointer
+            className={`w-10 h-10 flex items-center justify-center cursor-pointer
                 ${isLight ? 'bg-amber-100' : 'bg-amber-800'}
                 ${isSelected ? 'ring-4 ring-blue-500' : ''}
                 ${isPossibleMove ? 'ring-4 ring-green-400' : ''}
             `}
         >
             {piece && (
-                <span className="text-4xl select-none">
+                <span className="text-2xl select-none">
                     {getPieceEmoji(piece)}
                 </span>
             )}
