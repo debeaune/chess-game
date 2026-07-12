@@ -8,12 +8,13 @@ interface SquareProps {
     onClick: () => void
 }
 
-function getPieceEmoji(piece: Piece): string {
-    const emojis = {
-        white: { king: '♔', queen: '♕', rook: '♖', bishop: '♗', knight: '♘', pawn: '♙' },
-        black: { king: '♚', queen: '♛', rook: '♜', bishop: '♝', knight: '♞', pawn: '♟' }
-    }
-    return emojis[piece.color][piece.type]
+function getPieceImage(piece: Piece): string {
+    const color = piece.color === 'white' ? 'w' : 'b'
+    const type = {
+        king: 'K', queen: 'Q', rook: 'R', 
+        bishop: 'B', knight: 'N', pawn: 'P'
+    }[piece.type]
+    return `https://lichess1.org/assets/piece/cburnett/${color}${type}.svg`
 }
 
 function Square({ piece, isLight, isSelected, isPossibleMove, onClick }: SquareProps) {
@@ -27,9 +28,11 @@ function Square({ piece, isLight, isSelected, isPossibleMove, onClick }: SquareP
             `}
         >
             {piece && (
-                <span className="text-2xl select-none">
-                    {getPieceEmoji(piece)}
-                </span>
+                <img 
+                    src={getPieceImage(piece)}
+                    alt={`${piece.color} ${piece.type}`}
+                    className="w-8 h-8 select-none"
+                />
             )}
         </div>
     )
