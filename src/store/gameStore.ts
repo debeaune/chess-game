@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import type { Board, Position } from '../types/chess'
 import { createInitialBoard } from '../utils/initialBoard'
-import { getPawnMoves, getRookMoves, getBishopMoves,  getKnightMoves, getQueenMoves, getKingMoves, isKingInCheck } from '../utils/move'
+import { getPawnMoves, getRookMoves, getBishopMoves,  getKnightMoves, getQueenMoves, getKingMoves, isKingInCheck, isCheckmate } from '../utils/move'
 
 interface GameState {
     board: Board
@@ -9,6 +9,7 @@ interface GameState {
     selectedPosition: Position | null
     possibleMoves: Position[]
     isInCheck: boolean
+    isCheckmate: boolean
 }
 
 interface GameActions {
@@ -23,6 +24,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     selectedPosition: null,
     possibleMoves: [],
     isInCheck: false,
+    isCheckmate: false,
 
     selectPiece: (position) => set((state) => {
         const piece = state.board[position.row][position.col] 
@@ -70,13 +72,15 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
 
         const nextPlayer = currentPlayer === 'white' ? 'black' : 'white'
         const inCheck = isKingInCheck(newBoard, nextPlayer)
+        const checkmate = inCheck && isCheckmate(newBoard, nextPlayer)
 
         return {
             board: newBoard,
             selectedPosition: null,
             possibleMoves: [],
             currentPlayer: nextPlayer,
-            isInCheck: inCheck
+            isInCheck: inCheck,
+            isCheckmate: checkmate
         }
     }),
 

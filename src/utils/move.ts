@@ -196,5 +196,29 @@ export function isKingInCheck(board: Board, color: 'white' | 'black'): boolean {
     
 }
 
+export function isCheckmate(board: Board, color: 'white' | 'black'): boolean {
+    // Pour chaque pièce du joueur
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            const piece = board[row][col]
+            if (piece && piece.color === color) {
+                // Calculer ses mouvements possibles
+                const moves = getMovesForPiece(board, { row, col }, piece)
+                // Filtrer les mouvements qui laissent le roi en échec
+                const legalMoves = moves.filter(move => {
+                    const testBoard = board.map(r => [...r])
+                    testBoard[move.row][move.col] = testBoard[row][col]
+                    testBoard[row][col] = null
+                    return !isKingInCheck(testBoard, color)
+                })
+                // Si une pièce a au moins un mouvement légal → pas d'échec et mat
+                if (legalMoves.length > 0) return false
+            }
+        }
+    }
+    // Aucune pièce n'a de mouvement légal → échec et mat !
+    return true
+}
+
 
 
