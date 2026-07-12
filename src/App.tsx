@@ -9,7 +9,7 @@ function App() {
             <span className="text-white text-xl font-bold">
                 {currentPlayer === 'white' ? '♔ Tour des blancs' : '♚ Tour des noirs'}
             </span>
-            {isInCheck && (
+            {isInCheck && !isCheckmate && (
                 <div className="text-red-400 text-lg font-bold animate-pulse">
                     ⚠️ Échec !
                 </div>
