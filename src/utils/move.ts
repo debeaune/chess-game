@@ -120,7 +120,6 @@ export function getQueenMoves(board: Board, position: Position, color: 'white' |
         ...getRookMoves(board, position, color),
         ...getBishopMoves(board, position, color)
     ]
-    console.log('queen moves:', moves)
     return moves
 }
 

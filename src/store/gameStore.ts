@@ -26,7 +26,6 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
 
     selectPiece: (position) => set((state) => {
         const piece = state.board[position.row][position.col] 
-        console.log('currentPlayer', state.currentPlayer)
         if (!piece) return { selectedPosition: null, possibleMoves: [] }
         if (piece.color !== state.currentPlayer) return { selectedPosition: null, possibleMoves: [] }
     
@@ -45,6 +44,13 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         } else if (piece.type === 'king') {
             moves = getKingMoves(state.board, position, piece.color)
         }
+
+        moves = moves.filter(move => {
+            const testBoard = state.board.map(row => [...row])
+            testBoard[move.row][move.col] = testBoard[position.row][position.col]
+            testBoard[position.row][position.col] = null
+            return !isKingInCheck(testBoard, piece.color)
+        })
     
         return {
             selectedPosition: position,
@@ -64,7 +70,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
 
         const nextPlayer = currentPlayer === 'white' ? 'black' : 'white'
         const inCheck = isKingInCheck(newBoard, nextPlayer)
-    
+
         return {
             board: newBoard,
             selectedPosition: null,
