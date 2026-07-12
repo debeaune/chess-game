@@ -151,4 +151,51 @@ export function getKingMoves(board: Board, position: Position, color: 'white' | 
     return moves
 }
 
+function getMovesForPiece(board: Board, position: Position, piece: Piece): Position[] {
+    switch (piece.type) {
+        case 'pawn': return getPawnMoves(board, position, piece.color)
+        case 'rook': return getRookMoves(board, position, piece.color)
+        case 'bishop': return getBishopMoves(board, position, piece.color)
+        case 'knight': return getKnightMoves(board, position, piece.color)
+        case 'queen': return getQueenMoves(board, position, piece.color)
+        case 'king': return getKingMoves(board, position, piece.color)
+        default: return []
+    }
+}
+
+export function isKingInCheck(board: Board, color: 'white' | 'black'): boolean {
+    // 1. Trouver la position du roi
+    let kingPosition: Position | null = null
+    
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            const piece = board[row][col]
+            if (piece?.type === 'king' && piece?.color === color) {
+                kingPosition = { row, col }
+            }
+        }
+    }
+    
+    if (!kingPosition) return false
+    
+    // 2. Vérifier si une pièce adverse peut atteindre le roi
+    const opponentColor = color === 'white' ? 'black' : 'white'
+
+    for (let row = 0; row < 8; row++) {
+        for (let col = 0; col < 8; col++) {
+            const piece = board[row][col]
+            if (piece && piece.color === opponentColor) {
+                const moves = getMovesForPiece(board, { row, col }, piece)
+                if (moves.some(move => move.row === kingPosition!.row && move.col === kingPosition!.col)) {
+                    return true
+                }
+            }
+        }
+    }
+
+    return false
+    
+}
+
+
 
