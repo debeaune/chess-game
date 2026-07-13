@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { Board, Position } from '../types/chess'
+import type { Board, Position, Piece } from '../types/chess'
 import { createInitialBoard } from '../utils/initialBoard'
 import { getPawnMoves, getRookMoves, getBishopMoves,  getKnightMoves, getQueenMoves, getKingMoves, isKingInCheck, isCheckmate } from '../utils/move'
 
@@ -13,6 +13,10 @@ interface GameState {
     castlingRights: {
         white: { kingSide: boolean, queenSide: boolean }
         black: { kingSide: boolean, queenSide: boolean }
+    }
+    capturedPieces: {
+    white: Piece[]  // pièces capturées par les blancs
+    black: Piece[]  // pièces capturées par les noirs
     }
 }
 
@@ -28,11 +32,16 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     selectedPosition: null,
     possibleMoves: [],
     isInCheck: false,
+
     isCheckmate: false,
     castlingRights: {
-    white: { kingSide: true, queenSide: true },
-    black: { kingSide: true, queenSide: true }
-},
+        white: { kingSide: true, queenSide: true },
+        black: { kingSide: true, queenSide: true }
+    },
+    capturedPieces: {
+        white: [],
+        black: []
+    },
 
     selectPiece: (position) => set((state) => {
         const piece = state.board[position.row][position.col] 
@@ -125,6 +134,16 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             }
         }
 
+        const capturedPiece = board[to.row][to.col]
+        const newCapturedPieces = {
+            white: [...state.capturedPieces.white],
+            black: [...state.capturedPieces.black]
+        }
+
+        if (capturedPiece) {
+            newCapturedPieces[currentPlayer].push(capturedPiece)
+        }
+
         return {
             board: newBoard,
             selectedPosition: null,
@@ -132,7 +151,8 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             currentPlayer: nextPlayer,
             isInCheck: inCheck,
             isCheckmate: checkmate,
-            castlingRights: newCastlingRights
+            castlingRights: newCastlingRights,
+            capturedPieces: newCapturedPieces
         }
     }),
 
