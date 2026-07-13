@@ -10,6 +10,10 @@ interface GameState {
     possibleMoves: Position[]
     isInCheck: boolean
     isCheckmate: boolean
+    castlingRights: {
+        white: { kingSide: boolean, queenSide: boolean }
+        black: { kingSide: boolean, queenSide: boolean }
+    }
 }
 
 interface GameActions {
@@ -25,6 +29,10 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     possibleMoves: [],
     isInCheck: false,
     isCheckmate: false,
+    castlingRights: {
+    white: { kingSide: true, queenSide: true },
+    black: { kingSide: true, queenSide: true }
+},
 
     selectPiece: (position) => set((state) => {
         const piece = state.board[position.row][position.col] 
@@ -44,7 +52,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         }  else if (piece.type === 'queen') {
             moves = getQueenMoves(state.board, position, piece.color)
         } else if (piece.type === 'king') {
-            moves = getKingMoves(state.board, position, piece.color)
+            moves = getKingMoves(state.board, position, piece.color, state.castlingRights[piece.color])
         }
 
         moves = moves.filter(move => {
@@ -74,13 +82,50 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         const inCheck = isKingInCheck(newBoard, nextPlayer)
         const checkmate = inCheck && isCheckmate(newBoard, nextPlayer)
 
+        const newCastlingRights = { ...state.castlingRights }
+
+        const movingPiece = newBoard[to.row][to.col]
+
+        // Si le roi bouge → plus de roque possible
+        if (movingPiece?.type === 'king') {
+            newCastlingRights[currentPlayer] = { kingSide: false, queenSide: false }
+        }
+
+        // Si la tour bouge → on retire le roque du côté concerné
+        if (movingPiece?.type === 'rook') {
+            if (selectedPosition.col === 0) {
+                newCastlingRights[currentPlayer].queenSide = false
+            } else if (selectedPosition.col === 7) {
+                newCastlingRights[currentPlayer].kingSide = false
+            }
+        }
+
+        // Vérifier si c'est un roque
+        const piece = board[selectedPosition.row][selectedPosition.col]
+        if (piece?.type === 'king') {
+            const colDiff = to.col - selectedPosition.col
+    
+            // Petit roque (roi va de e1 à g1 → colDiff = 2)
+            if (colDiff === 2) {
+                newBoard[to.row][7] = null  // on vide la tour
+                newBoard[to.row][5] = { type: 'rook', color: piece.color }  // tour en f1
+            }
+    
+            // Grand roque (roi va de e1 à c1 → colDiff = -2)
+            if (colDiff === -2) {
+                newBoard[to.row][0] = null  // on vide la tour
+                newBoard[to.row][3] = { type: 'rook', color: piece.color }  // tour en d1
+            }
+        }
+
         return {
             board: newBoard,
             selectedPosition: null,
             possibleMoves: [],
             currentPlayer: nextPlayer,
             isInCheck: inCheck,
-            isCheckmate: checkmate
+            isCheckmate: checkmate,
+            castlingRights: newCastlingRights
         }
     }),
 
@@ -90,5 +135,9 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         selectedPosition: null,
         possibleMoves: [],
         isInCheck: false,
+        castlingRights: {
+        white: { kingSide: true, queenSide: true },
+        black: { kingSide: true, queenSide: true }
+    },
     }),
 }))

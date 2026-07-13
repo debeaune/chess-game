@@ -38,22 +38,22 @@ export function getRookMoves(board: Board, position: Position, color: 'white' | 
     ]
 
     directions.forEach(dir => {
-    let row = position.row + dir.row
-    let col = position.col + dir.col
+        let row = position.row + dir.row
+        let col = position.col + dir.col
     
-    while (row >= 0 && row < 8 && col >= 0 && col < 8) {
-        if (board[row][col] === null) {
-            moves.push({ row, col })
-        } else if (board[row][col]?.color !== color) {
-            moves.push({ row, col })
-            break
-        } else {
-            break
+        while (row >= 0 && row < 8 && col >= 0 && col < 8) {
+            if (board[row][col] === null) {
+                moves.push({ row, col })
+            } else if (board[row][col]?.color !== color) {
+                moves.push({ row, col })
+                break
+            } else {
+                break
+            }
+            row += dir.row
+            col += dir.col
         }
-        row += dir.row
-        col += dir.col
-    }
-})
+    })
 
     return moves
 }
@@ -123,7 +123,7 @@ export function getQueenMoves(board: Board, position: Position, color: 'white' |
     return moves
 }
 
-export function getKingMoves(board: Board, position: Position, color: 'white' | 'black'): Position[] {
+export function getKingMoves(board: Board, position: Position, color: 'white' | 'black', castlingRights: { kingSide: boolean, queenSide: boolean }): Position[] {
     const moves: Position[] = []
     const directions = [
         { row: -1, col: -1 }, // haut-gauche
@@ -147,17 +147,53 @@ export function getKingMoves(board: Board, position: Position, color: 'white' | 
         }
     })
 
+    // Petit roque (côté roi)
+    if (castlingRights.kingSide) {
+        if (
+            board[position.row][5] === null &&
+            board[position.row][6] === null &&
+            !isKingInCheck(board, color)
+        ) {
+            // Vérifier que la case 5 n'est pas attaquée
+            const testBoard = board.map(r => [...r])
+            testBoard[position.row][5] = { type: 'king', color }
+            testBoard[position.row][4] = null
+        
+            if (!isKingInCheck(testBoard, color)) {
+                moves.push({ row: position.row, col: 6 })
+            }
+        }
+    }
+
+    //Grand roque (côté dame)
+    if (castlingRights.queenSide) {
+        if (
+            board[position.row][3] === null &&
+            board[position.row][2] === null &&
+            board[position.row][1] === null &&
+            !isKingInCheck(board, color)
+        ) {
+            const testBoard = board.map(r => [...r])
+            testBoard[position.row][3] = { type: 'king', color }
+            testBoard[position.row][4] = null
+        
+            if (!isKingInCheck(testBoard, color)) {
+                moves.push({ row: position.row, col: 2 })
+            }
+        }
+    }
+
     return moves
 }
 
-function getMovesForPiece(board: Board, position: Position, piece: Piece): Position[] {
+function getMovesForPiece(board: Board, position: Position, piece: Piece, castlingRights?: { white: { kingSide: boolean, queenSide: boolean }, black: { kingSide: boolean, queenSide: boolean } }): Position[] {
     switch (piece.type) {
         case 'pawn': return getPawnMoves(board, position, piece.color)
         case 'rook': return getRookMoves(board, position, piece.color)
         case 'bishop': return getBishopMoves(board, position, piece.color)
         case 'knight': return getKnightMoves(board, position, piece.color)
         case 'queen': return getQueenMoves(board, position, piece.color)
-        case 'king': return getKingMoves(board, position, piece.color)
+        case 'king': return getKingMoves(board, position, piece.color, castlingRights?.[piece.color] ?? { kingSide: false, queenSide: false })
         default: return []
     }
 }
