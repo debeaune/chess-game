@@ -118,6 +118,13 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             }
         }
 
+        // Promotion du pion
+        if (newBoard[to.row][to.col]?.type === 'pawn') {
+            if (to.row === 0 || to.row === 7) {
+            newBoard[to.row][to.col] = { type: 'queen', color: newBoard[to.row][to.col]!.color }
+            }
+        }
+
         return {
             board: newBoard,
             selectedPosition: null,
