@@ -68,7 +68,9 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             const testBoard = state.board.map(row => [...row])
             testBoard[move.row][move.col] = testBoard[position.row][position.col]
             testBoard[position.row][position.col] = null
-            return !isKingInCheck(testBoard, piece.color)
+            const result = !isKingInCheck(testBoard, piece.color)
+            console.log('move:', move, 'valid:', result)
+            return result;
         })
     
         return {
@@ -163,8 +165,12 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         possibleMoves: [],
         isInCheck: false,
         castlingRights: {
-        white: { kingSide: true, queenSide: true },
-        black: { kingSide: true, queenSide: true }
-    },
+            white: { kingSide: true, queenSide: true },
+            black: { kingSide: true, queenSide: true },
+        },
+        capturedPieces: {
+            white: [],
+            black: [],
+        },
     }),
 }))
