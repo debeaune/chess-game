@@ -18,6 +18,7 @@ interface GameState {
     white: Piece[]  // pièces capturées par les blancs
     black: Piece[]  // pièces capturées par les noirs
     }
+    enPassantTarget: Position | null
 }
 
 interface GameActions {
@@ -32,7 +33,6 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     selectedPosition: null,
     possibleMoves: [],
     isInCheck: false,
-
     isCheckmate: false,
     castlingRights: {
         white: { kingSide: true, queenSide: true },
@@ -42,6 +42,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         white: [],
         black: []
     },
+    enPassantTarget: null, 
 
     selectPiece: (position) => set((state) => {
         const piece = state.board[position.row][position.col] 
@@ -51,7 +52,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         let moves: Position[] = []
     
         if (piece.type === 'pawn') {
-            moves = getPawnMoves(state.board, position, piece.color)
+            moves = getPawnMoves(state.board, position, piece.color, state.enPassantTarget)
         } else if (piece.type === 'rook') {
             moves = getRookMoves(state.board, position, piece.color)
         } else if (piece.type === 'bishop') {
@@ -86,21 +87,31 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
         newBoard[to.row][to.col] = newBoard[selectedPosition.row][selectedPosition.col]
         newBoard[selectedPosition.row][selectedPosition.col] = null
 
+        const movingPiece = board[selectedPosition.row][selectedPosition.col]  // pour l'en passant
+        let newEnPassantTarget: Position | null = null
+
+        if (movingPiece?.type === 'pawn' && Math.abs(to.row - selectedPosition.row) === 2) {
+            newEnPassantTarget = {
+                row: (to.row + selectedPosition.row) / 2,
+                col: to.col
+            }
+        }
+
         const nextPlayer = currentPlayer === 'white' ? 'black' : 'white'
         const inCheck = isKingInCheck(newBoard, nextPlayer)
         const checkmate = inCheck && isCheckmate(newBoard, nextPlayer)
 
         const newCastlingRights = { ...state.castlingRights }
 
-        const movingPiece = newBoard[to.row][to.col]
+        const movedPiece = newBoard[to.row][to.col] // pour le roque
 
         // Si le roi bouge → plus de roque possible
-        if (movingPiece?.type === 'king') {
+        if (movedPiece?.type === 'king') {
             newCastlingRights[currentPlayer] = { kingSide: false, queenSide: false }
         }
 
         // Si la tour bouge → on retire le roque du côté concerné
-        if (movingPiece?.type === 'rook') {
+        if (movedPiece?.type === 'rook') {
             if (selectedPosition.col === 0) {
                 newCastlingRights[currentPlayer].queenSide = false
             } else if (selectedPosition.col === 7) {
@@ -139,6 +150,17 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             black: [...state.capturedPieces.black]
         }
 
+        // En passant - supprimer le pion capturé
+        if (movingPiece?.type === 'pawn' && state.enPassantTarget && 
+            to.row === state.enPassantTarget.row && to.col === state.enPassantTarget.col) {
+            const capturedPawnRow = selectedPosition.row
+            const capturedPawn = board[capturedPawnRow][to.col]
+            newBoard[capturedPawnRow][to.col] = null
+            if (capturedPawn) {
+                newCapturedPieces[currentPlayer].push(capturedPawn)
+            }
+        }
+
         if (capturedPiece) {
             newCapturedPieces[currentPlayer].push(capturedPiece)
         }
@@ -151,7 +173,8 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             isInCheck: inCheck,
             isCheckmate: checkmate,
             castlingRights: newCastlingRights,
-            capturedPieces: newCapturedPieces
+            capturedPieces: newCapturedPieces,
+            enPassantTarget: newEnPassantTarget
         }
     }),
 
@@ -169,5 +192,6 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             white: [],
             black: [],
         },
+        enPassantTarget: null,
     }),
 }))
