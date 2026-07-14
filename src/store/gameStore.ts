@@ -64,6 +64,7 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             moves = getKingMoves(state.board, position, piece.color, state.castlingRights[piece.color])
         }
 
+        console.log('moves avant filtre:', moves)
         moves = moves.filter(move => {
             const testBoard = state.board.map(row => [...row])
             testBoard[move.row][move.col] = testBoard[position.row][position.col]

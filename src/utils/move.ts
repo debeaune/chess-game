@@ -20,7 +20,7 @@ export function getPawnMoves(board: Board, position: Position, color: 'white' | 
     const captureCols = [position.col - 1, position.col + 1]
 
     captureCols.forEach(col => {
-        if (col >= 0 && col < 8 && board[oneStep][col] !== null && board[oneStep][col]?.color !== color) {
+        if (col >= 0 && col < 8 && oneStep >= 0 && oneStep < 8 && board[oneStep][col] !== null && board[oneStep][col]?.color !== color) {
         moves.push({ row: oneStep, col })
         }
     })
