@@ -34,7 +34,6 @@ function App() {
                         <p className="text-amber-200 text-sm mb-1">Noirs ont pris :</p>
                         <div className="flex flex-wrap gap-1">
                             {capturedPieces.black.map((piece, i) => (
-                                console.log(piece),
                                 <img 
                                     key={i}
                                     alt=""
@@ -51,7 +50,6 @@ function App() {
                   <p className="text-amber-200 text-sm mb-1">Blancs ont pris :</p>
                     <div className="flex flex-wrap gap-1">
                         {capturedPieces.white.map((piece, i) => (
-                            console.log(piece),
                             <img 
                                 key={i}
                                 alt=""

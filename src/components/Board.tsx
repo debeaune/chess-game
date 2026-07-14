@@ -33,7 +33,6 @@ function Board() {
                                 isSelected={selectedPosition?.row === rowIndex && selectedPosition?.col === colIndex}
                                 isPossibleMove={possibleMoves.some(move => move.row === rowIndex && move.col === colIndex)}
                                 onClick={() => {
-                                    console.log('click sur', rowIndex, colIndex, 'isPossibleMove:', possibleMoves.some(move => move.row === rowIndex && move.col === colIndex))
                                     if (possibleMoves.some(move => move.row === rowIndex && move.col === colIndex)) {
                                         movePiece({ row: rowIndex, col: colIndex })
                                     } else {

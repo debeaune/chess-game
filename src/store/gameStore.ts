@@ -64,14 +64,11 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
             moves = getKingMoves(state.board, position, piece.color, state.castlingRights[piece.color])
         }
 
-        console.log('moves avant filtre:', moves)
         moves = moves.filter(move => {
             const testBoard = state.board.map(row => [...row])
             testBoard[move.row][move.col] = testBoard[position.row][position.col]
             testBoard[position.row][position.col] = null
-            const result = !isKingInCheck(testBoard, piece.color)
-            console.log('move:', move, 'valid:', result)
-            return result;
+            return !isKingInCheck(testBoard, piece.color);
         })
     
         return {
@@ -81,7 +78,6 @@ export const useGameStore = create<GameState & GameActions>((set) => ({
     }),
 
     movePiece: (to) => set((state) => {
-        console.log('movePiece appelé', to)
         const { board, selectedPosition, currentPlayer } = state
     
         if (!selectedPosition) return {}
