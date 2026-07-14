@@ -21,7 +21,7 @@ function Square({ piece, isLight, isSelected, isPossibleMove, onClick }: SquareP
     return (
         <div
             onClick={onClick}
-            className={`w-10 h-10 flex items-center justify-center cursor-pointer
+            className={`w-12 h-12 flex items-center justify-center cursor-pointer
                 ${isLight ? 'bg-amber-100' : 'bg-amber-800'}
                 ${isSelected ? 'ring-4 ring-blue-500' : ''}
                 ${isPossibleMove ? 'ring-4 ring-green-400' : ''}
@@ -31,7 +31,7 @@ function Square({ piece, isLight, isSelected, isPossibleMove, onClick }: SquareP
                 <img 
                     src={getPieceImage(piece)}
                     alt={`${piece.color} ${piece.type}`}
-                    className="w-8 h-8 select-none"
+                    className="w-10 h-10 select-none"
                 />
             )}
         </div>

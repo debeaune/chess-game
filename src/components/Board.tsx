@@ -6,10 +6,10 @@ function Board() {
 
     return (
         <div className="flex flex-col items-center">
-            <div className="flex">
+            <div className="flex mb-2">
                 <div className="w-6" /> {/* espace pour les chiffres */}
                     {['a','b','c','d','e','f','g','h'].map(letter => (
-                    <div key={letter} className="w-10 text-center text-amber-200 text-sm font-bold">
+                    <div key={letter} className="w-12 text-center text-amber-200 text-sm font-bold">
                         {letter}
                     </div>
                 ))}
@@ -17,7 +17,7 @@ function Board() {
             <div className="flex">
                 <div className="flex flex-col justify-around mr-1">
                     {[8,7,6,5,4,3,2,1].map(num => (
-                        <div key={num} className="w-6 text-center text-amber-200 text-sm font-bold h-10 flex items-center">
+                        <div key={num} className="w-6 text-center text-amber-200 text-sm font-bold h-12 flex items-center">
                             {num}
                         </div>
                     ))}
