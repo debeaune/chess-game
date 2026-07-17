@@ -6,7 +6,7 @@ A fully functional chess game built with React, TypeScript, Tailwind CSS and Zus
 
 ---
 
-🎮 **[Jouer en ligne](ton-url-vercel.app)**
+🎮 **[Jouer en ligne](https://chess-game-dxog.vercel.app/)**
 
 ## 🚀 Technologies
 
