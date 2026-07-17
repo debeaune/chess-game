@@ -1,6 +1,6 @@
 import type { Board, Piece, Position } from '../types/chess'
 
-export function getPawnMoves(board: Board, position: Position, color: 'white' | 'black', enPassantTarget: Position | null): Position[] {
+export function getPawnMoves(board: Board, position: Position, color: 'white' | 'black', enPassantTarget?: Position | null): Position[] {
     const moves: Position[] = []
     const direction = color === 'white' ? -1 : 1
 
