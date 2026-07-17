@@ -6,6 +6,8 @@ A fully functional chess game built with React, TypeScript, Tailwind CSS and Zus
 
 ---
 
+🎮 **[Jouer en ligne](ton-url-vercel.app)**
+
 ## 🚀 Technologies
 
 - **React 19** — UI and component architecture
